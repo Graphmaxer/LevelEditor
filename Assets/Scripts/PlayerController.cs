@@ -4,8 +4,8 @@
 public class PlayerController : MonoBehaviour
 {
     private CharacterController cc;
-    private const float speed = 5f; // Character speed
-    private const float mouseXMultiplicator = 40f; // Character rotation (X axis, horizontal)
+    private const float speed = 0.1f; // Character speed
+    private const float mouseSensitivity = 40f; // Mouse sensitivity for camera rotation
 
     private void Start()
     {
@@ -23,16 +23,21 @@ public class PlayerController : MonoBehaviour
             else
                 Cursor.lockState = CursorLockMode.Locked;
         }
+    }
 
+    public void FixedUpdate()
+    {
         // Move character
         Vector3 move = Vector3.zero;
         if (cc.isGrounded)
         {
-            move = transform.TransformDirection(new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical")) * speed);
+            move = (transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical")) * speed;
         }
-        move.y -= -Physics.gravity.y * Time.deltaTime;
-        cc.Move(move * Time.deltaTime);
+        move.y -= -Physics.gravity.y;
+        cc.Move(move);
+
         // Rotate character
-        transform.Rotate(new Vector3(0f, Input.GetAxis("Mouse X") * mouseXMultiplicator, 0f) * Time.deltaTime);
+        // TODO: Need to check angle limits
+        transform.eulerAngles += new Vector3(-Input.GetAxis("Mouse Y") * mouseSensitivity, Input.GetAxis("Mouse X") * mouseSensitivity, 0.0f);
     }
 }
